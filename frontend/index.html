@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QR-Chaff — Quantum-Resistant Chaffing System</title>
+  <meta name="description" content="Post-Quantum Metadata Obfuscation Layer using Neuro-Fuzzy Traffic Synthesis. Real-time dashboard for managing encrypted sessions, post-quantum keys, and live traffic monitoring." />
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/style.css"/>
+</head>
+<body>
+  <!-- ── Navigation ────────────────────────────────────────────────── -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="nav-icon">🛡️</span>
+      <span class="nav-title">QR-Chaff</span>
+      <span class="nav-version">v1.0</span>
+    </div>
+    <div class="nav-status">
+      <span class="pq-badge" id="pqBadge">PQ: checking...</span>
+      <div class="engine-indicator" id="engineIndicator">
+        <span class="dot" id="engineDot"></span>
+        <span id="engineStatusText">Engine: Offline</span>
+      </div>
+    </div>
+    <div class="nav-auth" id="navAuth">
+      <button class="btn btn-ghost" id="loginBtn">Login</button>
+      <button class="btn btn-primary" id="registerBtn">Register</button>
+    </div>
+    <div class="nav-user hidden" id="navUser">
+      <span id="usernameDisplay" class="username"></span>
+      <button class="btn btn-ghost" id="logoutBtn">Logout</button>
+    </div>
+  </nav>
+
+  <!-- ── Hero / Login Wall ─────────────────────────────────────────── -->
+  <div id="authWall" class="auth-wall">
+    <div class="hero-glow"></div>
+    <div class="auth-container">
+      <div class="hero-badge">Post-Quantum Security</div>
+      <h1 class="hero-title">Quantum-Resistant<br/><span class="gradient-text">Chaffing System</span></h1>
+      <p class="hero-subtitle">
+        Traffic analysis defense combining <strong>Kyber512 KEM</strong>, 
+        <strong>ANFIS traffic synthesis</strong>, and <strong>GAN-based obfuscation</strong>
+        — secure against classical and quantum adversaries.
+      </p>
+      <div class="feature-grid">
+        <div class="feature-card"><div class="feature-icon">🔐</div><div>Kyber512 KEM</div></div>
+        <div class="feature-card"><div class="feature-icon">🤖</div><div>ANFIS Generator</div></div>
+        <div class="feature-card"><div class="feature-icon">🔀</div><div>Multipath Routing</div></div>
+        <div class="feature-card"><div class="feature-icon">🖼️</div><div>LSB Steganography</div></div>
+        <div class="feature-card"><div class="feature-icon">🎭</div><div>GAN Discriminator</div></div>
+        <div class="feature-card"><div class="feature-icon">📡</div><div>WebSocket Streaming</div></div>
+      </div>
+      <div class="auth-buttons">
+        <button class="btn btn-primary btn-lg" id="heroLoginBtn">Login</button>
+        <button class="btn btn-outline btn-lg" id="heroRegisterBtn">Create Account</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Main Dashboard ─────────────────────────────────────────────── -->
+  <main id="dashboard" class="dashboard hidden">
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value" id="statTotal">0</div>
+        <div class="stat-label">Total Packets</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value real" id="statReal">0</div>
+        <div class="stat-label">Real Packets</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value dummy" id="statDummy">0</div>
+        <div class="stat-label">Dummy Packets</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value entropy" id="statEntropy">—</div>
+        <div class="stat-label">Avg Entropy (bits/B)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value disc" id="statDisc">—</div>
+        <div class="stat-label">GAN Score</div>
+        <div class="stat-hint" title="0=perfect obfuscation, 1=detectable">ⓘ</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value pq" id="statPQ">—</div>
+        <div class="stat-label">PQ Mode</div>
+      </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="content-grid">
+
+      <!-- Left Panel: Controls -->
+      <div class="panel panel-controls">
+        <h2 class="panel-title">⚙️ Session Control</h2>
+
+        <!-- Session Management -->
+        <div class="form-group">
+          <label>Session Name</label>
+          <input type="text" id="sessionName" class="input" placeholder="My Obfuscation Session"/>
+        </div>
+        <button class="btn btn-primary w-full" id="createSessionBtn">+ Create Session</button>
+
+        <div class="session-list" id="sessionList">
+          <div class="empty-state">No sessions yet</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Engine Controls -->
+        <h3 class="section-title">Engine</h3>
+        <div class="btn-group">
+          <button class="btn btn-success w-full" id="startEngineBtn" disabled>▶ Start Engine</button>
+          <button class="btn btn-danger w-full mt-1" id="stopEngineBtn" disabled>⏹ Stop Engine</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Send Data -->
+        <h3 class="section-title">Send Encrypted Message</h3>
+        <div class="form-group">
+          <textarea id="sendMessage" class="input" rows="3"
+            placeholder="Enter secret message to send through obfuscation layer..."></textarea>
+        </div>
+        <button class="btn btn-primary w-full" id="sendDataBtn" disabled>🔐 Send (AES-256-GCM)</button>
+
+        <div class="divider"></div>
+
+        <!-- Crypto Keys -->
+        <h3 class="section-title">Post-Quantum Keys</h3>
+        <div class="form-group">
+          <label>Algorithm</label>
+          <select id="keyAlgorithm" class="input">
+            <option value="Kyber512">Kyber512 (KEM — NIST standard)</option>
+            <option value="Kyber768">Kyber768 (KEM — higher security)</option>
+            <option value="Dilithium2">Dilithium2 (Signatures — NIST standard)</option>
+            <option value="Dilithium3">Dilithium3 (Signatures — higher security)</option>
+          </select>
+        </div>
+        <button class="btn btn-outline w-full" id="generateKeyBtn">🔑 Generate Keypair</button>
+        <div class="key-list" id="keyList"></div>
+      </div>
+
+      <!-- Right Panel: Live Charts -->
+      <div class="panel panel-charts">
+        <div class="chart-tabs">
+          <button class="tab active" data-tab="traffic">📈 Traffic</button>
+          <button class="tab" data-tab="entropy">🌀 Entropy</button>
+          <button class="tab" data-tab="multipath">🔀 Multipath</button>
+          <button class="tab" data-tab="log">📋 Log</button>
+        </div>
+
+        <!-- Traffic Chart -->
+        <div id="tab-traffic" class="tab-content active">
+          <h3 class="chart-title">Packet Size over Time</h3>
+          <canvas id="trafficChart" height="280"></canvas>
+        </div>
+
+        <!-- Entropy Chart -->
+        <div id="tab-entropy" class="tab-content">
+          <h3 class="chart-title">Shannon Entropy per Packet <span class="hint">(8.0 = perfectly random)</span></h3>
+          <canvas id="entropyChart" height="280"></canvas>
+        </div>
+
+        <!-- Multipath -->
+        <div id="tab-multipath" class="tab-content">
+          <h3 class="chart-title">Multipath Routing Distribution</h3>
+          <div class="multipath-grid">
+            <div class="path-bar-wrap">
+              <div class="path-label">Path 0</div>
+              <div class="path-bar-bg"><div class="path-bar" id="path0bar" style="width:33%"></div></div>
+              <div class="path-count" id="path0count">0</div>
+            </div>
+            <div class="path-bar-wrap">
+              <div class="path-label">Path 1</div>
+              <div class="path-bar-bg"><div class="path-bar path1" id="path1bar" style="width:33%"></div></div>
+              <div class="path-count" id="path1count">0</div>
+            </div>
+            <div class="path-bar-wrap">
+              <div class="path-label">Path 2</div>
+              <div class="path-bar-bg"><div class="path-bar path2" id="path2bar" style="width:33%"></div></div>
+              <div class="path-count" id="path2count">0</div>
+            </div>
+          </div>
+          <p class="chart-desc">Traffic split across multiple paths resists correlation attacks — an adversary at both ends cannot match ingress to egress packets.</p>
+        </div>
+
+        <!-- Log -->
+        <div id="tab-log" class="tab-content">
+          <h3 class="chart-title">Live Packet Log</h3>
+          <div class="log-container" id="packetLog">
+            <div class="log-empty">Waiting for engine...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ── Auth Modals ─────────────────────────────────────────────────── -->
+  <div id="loginModal" class="modal-overlay hidden">
+    <div class="modal">
+      <button class="modal-close" id="closeLoginModal">✕</button>
+      <h2>Login</h2>
+      <div class="form-group"><label>Username</label><input type="text" id="loginUsername" class="input" placeholder="username"/></div>
+      <div class="form-group"><label>Password</label><input type="password" id="loginPassword" class="input" placeholder="••••••••"/></div>
+      <div class="error hidden" id="loginError"></div>
+      <button class="btn btn-primary w-full mt-2" id="submitLogin">Login</button>
+      <p class="modal-footer">No account? <a href="#" id="switchToRegister">Register</a></p>
+    </div>
+  </div>
+
+  <div id="registerModal" class="modal-overlay hidden">
+    <div class="modal">
+      <button class="modal-close" id="closeRegisterModal">✕</button>
+      <h2>Create Account</h2>
+      <div class="form-group"><label>Username</label><input type="text" id="regUsername" class="input" placeholder="username"/></div>
+      <div class="form-group"><label>Email</label><input type="email" id="regEmail" class="input" placeholder="you@example.com"/></div>
+      <div class="form-group"><label>Password</label><input type="password" id="regPassword" class="input" placeholder="••••••••"/></div>
+      <div class="error hidden" id="registerError"></div>
+      <button class="btn btn-primary w-full mt-2" id="submitRegister">Create Account</button>
+      <p class="modal-footer">Have an account? <a href="#" id="switchToLogin">Login</a></p>
+    </div>
+  </div>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>
